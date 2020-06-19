@@ -106,16 +106,22 @@ def get_stats():
 
 def plot(f,x,y):
     plt.plot(x,y,'.',label=f)
-            
+
+def log(k):
+    if k==0:
+        return 0
+    else:
+        return math.log(k,10)
+    
 if '__main__' == __name__:
 
     filename = sys.argv[1]
     
     filenames_list = get_list_filename(filename)
-    
+    print(filenames_list)
     for f in filenames_list:
         parse_file(f)
-    
+        
     stats = get_stats()
     # print(stats)
 
@@ -123,11 +129,12 @@ if '__main__' == __name__:
 
     for f in stats.keys():
 
-        x = list([math.copysign(math.log(abs(k),10),k) for k in stats[f].keys()])
+        x = list([math.copysign(log(abs(k)),k) for k in stats[f].keys()])
         y = list(stats[f].values())
 
         print(len(x))
         plot(f,x,y)
 
     plt.legend()
-    plt.savefig(filename+'.pdf')
+    savename = os.path.splitext(filename)[0]
+    plt.savefig(savename+'.pdf')
