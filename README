@@ -1,7 +1,9 @@
 cr-libm, a portable, efficient, correctly rounded mathematical library.
 
 To compile: 
-./configure; make;
+./prepare
+./configure CC=verificarlo-c
+make
 
 (for options see ./configure --help)
 
