@@ -10,7 +10,10 @@ make
 To run the selftest:
 make check;
 
-
+To check accuracy agains MCA:
+cd tests
+./test.sh
+./plot.sh
 
 Beta release note: 
 
