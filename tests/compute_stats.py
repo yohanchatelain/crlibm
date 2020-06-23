@@ -16,7 +16,10 @@ values_map = dict()
 # Errro for <fct> with rounding <RM>
 def get_function_name(line):
     splt = line.strip().split()
-    name = splt[2] + splt[5]
+    if line.find("exit status") != -1:
+        name = splt[1]
+    else:
+        name = splt[2] + splt[5]
     return name
 
 # 0      1    2    3
@@ -71,10 +74,10 @@ def parse_file(filename):
             continue
     
 
-def get_list_filename(filename):
-    ls = os.listdir('.')
-    return [f for f in ls if f.startswith(filename)]
-
+def get_list_filename(directory):
+    ls = os.listdir(directory)
+    return [directory + os.path.sep + f for f in ls if os.path.isfile(directory + os.path.sep + f)]
+    
 def get_s(mean, std):
     if mean==0:
         return 0
@@ -92,10 +95,22 @@ def get_stats():
         stats[function] = dict()
         for inputs,outputs in values.items():
             na = np.array(outputs, dtype=np.float128)
-            mean = na.mean()
-            std = na.std(dtype=np.float128)
-            s = get_s(mean, std)
+            for a in na:
+                if math.isnan(a):
+                    print("NAN found")
+            na = np.array([a for a in na if not math.isnan(a)])
+            for a in na:
+                if math.isinf(a):
+                    print("INF found")
+            na = np.array([a for a in na if not math.isinf(a)])
+            if na.size > 0:
+                mean = na.mean()
+                std = na.std(dtype=np.float128)
+                s = get_s(mean, std)
+            else:
+                s = 0
             stats[function][inputs] = s
+                
             print('\tInput: {i}\t Mean: {m}\t Std: {std}\t S: {s}'.format(i=inputs,
                                                                           m=mean,
                                                                           std=std,
@@ -112,29 +127,40 @@ def log(k):
         return 0
     else:
         return math.log(k,10)
-    
+
+# {MODE}_EXP_{function}
+def get_title(directory):
+    splt = directory.split("_")
+    mode = splt[0].split('/')[0]
+    function = splt[2]
+    return "Function {fun} (mode {mode})".format(fun=function,
+                                                 mode=mode)
+
 if '__main__' == __name__:
 
-    filename = sys.argv[1]
-    
-    filenames_list = get_list_filename(filename)
+    directory = sys.argv[1]
+    print(directory)
+    filenames_list = get_list_filename(directory)
     print(filenames_list)
     for f in filenames_list:
         parse_file(f)
         
     stats = get_stats()
-    # print(stats)
+    print(stats)
 
-    plt.title(filename)
+    title = get_title(directory)
+    plt.title(title)
 
     for f in stats.keys():
 
         x = list([math.copysign(log(abs(k)),k) for k in stats[f].keys()])
         y = list(stats[f].values())
-
+        print(f)
         print(len(x))
         plot(f,x,y)
 
+    plt.xlabel("Inputs exponent")
+    plt.ylabel("Number of significant digits (b=10)")
     plt.legend()
-    savename = os.path.splitext(filename)[0]
+    savename = directory.split("_")[-1]
     plt.savefig(savename+'.pdf')

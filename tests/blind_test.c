@@ -52,6 +52,7 @@ int main (int argc, char *argv[])
 #endif
   int (*mpfr_fun)() = NULL;
   double (*testfun_crlibm)() = NULL;
+  double (*testfun_libm)() = NULL;
   double (*unused)() = NULL;
 
   FILE* f;
@@ -104,7 +105,7 @@ int main (int argc, char *argv[])
     test_init(
 	      &unused, &unused, 
 	      &testfun_crlibm, 
-	      &mpfr_fun, &unused, &unused, &unused, &worstcase,
+	      &mpfr_fun, &unused, &unused, &testfun_libm, &worstcase,
 	      function_name,
 	      rounding_mode ) ;
     

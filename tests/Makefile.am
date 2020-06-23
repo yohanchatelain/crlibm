@@ -8,7 +8,7 @@ else
 bin_PROGRAMS =  crlibm_testval crlibm_soaktest crlibm_testperf  crlibm_blindtest crlibm_generate_test_vectors
 endif
 
-LDADD= $(top_builddir)/libcrlibm.a
+LDADD= $(top_builddir)/libcrlibm.a $(top_builddir)/libopenlibm.a
 INCLUDES=-I$(top_srcdir)
 ../libcrlibm.a:
 	cd $(top_srcdir); make libcrlibm.a 
